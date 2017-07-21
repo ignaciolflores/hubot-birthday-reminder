@@ -49,7 +49,7 @@ module.exports = (robot) ->
     date = msg.match[3]
     
     users = robot.brain.usersForFuzzyName(name)
-    if users.length is 1 or name = 'hubot'
+    if users.length is 1
       user = users[0]
       date_formatted = moment(date, date_format);
       date_unix = date_formatted.unix();
