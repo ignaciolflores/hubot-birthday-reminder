@@ -24,7 +24,7 @@ date_format = process.env.BIRTHDAY_DATE_FORMAT || "MM/DD"
 
 module.exports = (robot) ->
 
-  regex = /^(set birthday) (?:@?([\w .\-]+)\?*) ((0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[0-2]))\b/i
+  regex = /^(set birthday) (?:@?([\w .\-]+)\?*) (.*)/i
 
   # runs a cron job every day at 9:30 am
   dailyBirthdayCheck = schedule.scheduleJob process.env.BIRTHDAY_CRON_STRING, ->
@@ -82,16 +82,15 @@ module.exports = (robot) ->
     for k of (users or {})
       user = users[k]
       if isValidBirthdate user.date_of_birth
-        if equalDates date, moment(user.date_of_birth, date_format)
+        if equalDates date, moment.unix(user.date_of_birth).format(date_format)
           matches.push user
     return matches
 
   # returns `true` is date string is a valid date
   isValidBirthdate = (date) ->
     if date
-      if date.length > 0
-        if moment.unix(date).isValid
-          return true
+      if moment(date).isValid
+        return true
     return false
 
   # returns `true` if two dates have the same month and day of month
