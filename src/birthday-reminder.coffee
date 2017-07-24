@@ -19,8 +19,6 @@
 schedule = require('node-schedule')
 moment = require('moment')
 
-date_format = process.env.BIRTHDAY_DATE_FORMAT || "MM/DD"
-
 module.exports = (robot) ->
 
   regex = /^(set birthday) (?:@?([\w .\-]+)\?*) ((0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[0-2]))\b/i
@@ -32,12 +30,12 @@ module.exports = (robot) ->
 
     if birthdayUsers.length is 1
       # send message for one users birthday
-      msg = "<!channel> Today is <@#{birthdayUsers[0].name}>'s birthday!"
+      msg = "Today is <@#{birthdayUsers[0].name}>'s birthday!"
       msg += "\n#{quote()}"
       robot.messageRoom "#general", msg
     else if birthdayUsers.length > 1
       # send message for multiple users birthdays
-      msg = "<!channel> Today is "
+      msg = "Today is "
       for user, idx in birthdayUsers
         msg += "<@#{user.name}>'s#{if idx != (birthdayUsers.length - 1) then " and " else ""}"
       msg += " birthday!"
@@ -51,10 +49,8 @@ module.exports = (robot) ->
     users = robot.brain.usersForFuzzyName(name)
     if users.length is 1
       user = users[0]
-      date_formatted = moment(date, date_format);
-      date_unix = date_formatted.unix();
-      user.date_of_birth = date_unix
-      msg.send "#{name} is now born on #{moment.unix(user.date_of_birth).format(date_format)}"
+      user.date_of_birth = date
+      msg.send "#{name} is now born on #{user.date_of_birth}"
     else if users.length > 1
       msg.send getAmbiguousUserText users
     else
@@ -69,7 +65,7 @@ module.exports = (robot) ->
       for k of (users or {})
         user = users[k]
         if isValidBirthdate user.date_of_birth
-          message += "#{user.name} was born on #{moment.unix(user.date_of_birth).format(date_format)}\n"
+          message += "#{user.name} was born on #{user.date_of_birth}\n"
       msg.send message
 
   getAmbiguousUserText = (users) ->
@@ -81,7 +77,7 @@ module.exports = (robot) ->
     for k of (users or {})
       user = users[k]
       if isValidBirthdate user.date_of_birth
-        if equalDates date, moment(user.date_of_birth, date_format)
+        if equalDates date, moment(user.date_of_birth, "DD/MM")
           matches.push user
     return matches
 
@@ -89,7 +85,7 @@ module.exports = (robot) ->
   isValidBirthdate = (date) ->
     if date
       if date.length > 0
-        if moment.unix(date).isValid
+        if moment(date, "DD/MM").isValid
           return true
     return false
 
