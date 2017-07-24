@@ -1,23 +1,23 @@
 {
   "name": "hubot-birthday-reminder",
-  "description": "A hubot script to track birthdays",
-  "version": "0.1.1",
-  "author": "Phill Farrugia <me@phillfarrugia.com>",
+  "description": "A fork of a hubot script to track birthdays",
+  "version": "0.1.2",
+  "author": "MinnPost <tech@minnpost.com>",
   "license": "MIT",
   "keywords": [
     "birthday"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/phillfarrugia/hubot-birthday-reminder.git"
+    "url": "https://github.com/minnpost/hubot-birthday-reminder.git"
   },
   "bugs": {
-    "url": "https://github.com/phillfarrugia/hubot-birthday-reminder/issues"
+    "url": "https://github.com/minnpost/hubot-birthday-reminder/issues"
   },
   "dependencies": {
     "coffee-script": "~1.6",
-    "moment": "^2.10.6",
-    "node-schedule": "^0.6.0"
+    "moment": "^2.18.1",
+    "node-schedule": "^1.2.0"
   },
   "devDependencies": {
     "mocha": "*",

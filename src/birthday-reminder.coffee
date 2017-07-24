@@ -2,8 +2,8 @@
 #   Track birthdays for users
 #
 # Dependencies:
-#   "moment": "^2.10.6"
-#   "node-schedule": "^0.6.0"
+#   "moment": "^2.18.1"
+#   "node-schedule": "^1.2.0"
 #
 # Commands:
 #   set birthday @username dd/mm/ - Set a date of birth for a user
@@ -15,6 +15,7 @@
 #
 # Author:
 #   Phill Farrugia <me@phillfarrugia.com>
+#   MinnPost <tech@minnpost.com>
 
 schedule = require('node-schedule')
 moment = require('moment')
