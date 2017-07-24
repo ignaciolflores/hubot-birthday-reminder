@@ -6,12 +6,13 @@
 #   "node-schedule": "^1.2.0"
 #
 # Commands:
-#   set birthday @username dd/mm/ - Set a date of birth for a user
-#   hubot list birthdays - List all set date of births
+#   set birthday @username mm/dd - Set a date of birth for a user. Date format is customizable with an ENV variable.
+#   hubot list birthdays - List all known birthdays
 #
 # Notes:
 #   Birthday greeting messages based on Steffen Opel's
 #   https://github.com/github/hubot-scripts/blob/master/src/scripts/birthday.coffee
+#   Updated to allow any valid date format, according to the moment library
 #
 # Author:
 #   Phill Farrugia <me@phillfarrugia.com>
