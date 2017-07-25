@@ -50,7 +50,12 @@ module.exports = (robot) ->
   robot.hear regex, (msg) ->
     name = msg.match[2]
     date = msg.match[3]
-    
+
+    check_date = moment(date, date_format, true)
+    unless check_date.isValid()
+      msg.send "This date doesn't appear to be a valid birthdate for #{name}. A valid date format is #{date_format}."
+      return
+      
     users = robot.brain.usersForFuzzyName(name)
     if users.length is 1
       user = users[0]
