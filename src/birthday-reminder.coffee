@@ -22,6 +22,7 @@ schedule = require('node-schedule')
 moment = require('moment')
 
 date_format = process.env.BIRTHDAY_DATE_FORMAT || "MM/DD"
+daily_post_room = process.env.BIRTHDAY_DAILY_POST_ROOM || "#general"
 
 module.exports = (robot) ->
 
@@ -36,7 +37,7 @@ module.exports = (robot) ->
       # send message for one users birthday
       msg = "Today is <@#{birthdayUsers[0].name}>'s birthday!"
       msg += "\n#{quote()}"
-      robot.messageRoom "#general", msg
+      robot.messageRoom daily_post_room, msg
     else if birthdayUsers.length > 1
       # send message for multiple users birthdays
       msg = "Today is "
@@ -44,7 +45,7 @@ module.exports = (robot) ->
         msg += "<@#{user.name}>'s#{if idx != (birthdayUsers.length - 1) then " and " else ""}"
       msg += " birthday!"
       msg += "\n#{quote()}"
-      robot.messageRoom "#general", msg
+      robot.messageRoom daily_post_room, msg
 
   robot.hear regex, (msg) ->
     name = msg.match[2]
