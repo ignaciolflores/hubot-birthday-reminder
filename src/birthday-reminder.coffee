@@ -121,7 +121,7 @@ module.exports = (robot) ->
       "Birthdays are good for you. Statistics show that people who have the most live the longest!",
       "I'm so glad you were born, because you brighten my life and fill it with joy.",
       "Always remember: growing old is mandatory, growing up is optional.",
-      "Better to be over the hill than burried under it.",
+      "Better to be over the hill than buried under it.",
       "You always have such fun birthdays, you should have one every year.",
       "Happy birthday to you, a person who is smart, good looking, and funny and reminds me a lot of myself.",
       "We know we're getting old when the only thing we want for our birthday is not to be reminded of it.",
