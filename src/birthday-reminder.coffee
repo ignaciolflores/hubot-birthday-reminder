@@ -89,7 +89,7 @@ module.exports = (robot) ->
     for k of (users or {})
       user = users[k]
       if isValidBirthdate user.date_of_birth
-        if equalDates date, moment.unix(user.date_of_birth).format(date_format)
+        if equalDates date, moment.unix(user.date_of_birth)
           matches.push user
     return matches
 
