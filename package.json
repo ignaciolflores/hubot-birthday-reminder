@@ -1,7 +1,7 @@
 {
   "name": "hubot-birthday-reminder",
   "description": "A fork of a hubot script to track birthdays",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "MinnPost <tech@minnpost.com>",
   "license": "MIT",
   "keywords": [
@@ -16,18 +16,18 @@
   },
   "dependencies": {
     "coffee-script": "~1.12",
-    "moment": "^2.18.1",
-    "node-schedule": "^1.2.5"
+    "moment": "^2.20.1",
+    "node-schedule": "^1.3.0"
   },
   "devDependencies": {
-    "mocha": "*",
     "chai": "*",
-    "sinon-chai": "*",
-    "sinon": "*",
+    "grunt-contrib-watch": "~1.0.0",
     "grunt-mocha-test": "~0.13.3",
     "grunt-release": "~0.14.0",
     "matchdep": "~2.0.0",
-    "grunt-contrib-watch": "~1.0.0"
+    "mocha": "^5.0.0",
+    "sinon": "^5.0.0",
+    "sinon-chai": "*"
   },
   "main": "index.coffee",
   "scripts": {

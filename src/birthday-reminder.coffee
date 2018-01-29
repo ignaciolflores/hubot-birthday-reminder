@@ -2,8 +2,8 @@
 #   Track birthdays for users
 #
 # Dependencies:
-#   "moment": "^2.18.1"
-#   "node-schedule": "^1.2.0"
+#   "moment": "^2.20.1"
+#   "node-schedule": "^1.3.0"
 #
 # Commands:
 #   set birthday @username mm/dd - Set a date of birth for a user. Date format is customizable with an ENV variable.
@@ -45,6 +45,26 @@ module.exports = (robot) ->
         msg += "<@#{user.name}>'s#{if idx != (birthdayUsers.length - 1) then " and " else ""}"
       msg += " birthday!"
       msg += "\n#{quote()}"
+      robot.messageRoom daily_post_room, msg
+
+  robot.respond /check birthdays/i, (msg) ->
+    birthdayUsers = findUsersBornOnDate(moment(), robot.brain.data.users)
+
+    if birthdayUsers.length is 1
+      # send message for one users birthday
+      msg = "Today is <@#{birthdayUsers[0].name}>'s birthday!"
+      msg += "\n#{quote()}"
+      robot.messageRoom daily_post_room, msg
+    else if birthdayUsers.length > 1
+      # send message for multiple users birthdays
+      msg = "Today is "
+      for user, idx in birthdayUsers
+        msg += "<@#{user.name}>'s#{if idx != (birthdayUsers.length - 1) then " and " else ""}"
+      msg += " birthday!"
+      msg += "\n#{quote()}"
+      robot.messageRoom daily_post_room, msg
+    else
+      msg = "Nobody has a birthday today"
       robot.messageRoom daily_post_room, msg
 
   robot.hear regex, (msg) ->
