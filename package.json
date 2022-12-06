@@ -29,7 +29,7 @@
     "sinon": "^5.0.0",
     "sinon-chai": "*"
   },
-  "main": "index.coffee",
+  "main": "index.js",
   "scripts": {
     "test": "grunt test"
   }
