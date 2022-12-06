@@ -6,8 +6,10 @@
 //   "node-schedule": "^1.3.0"
 //
 // Commands:
-//   set birthday @username mm/dd - Set a date of birth for a user. Date format is customizable with an ENV variable.
+//   hubot set birthday @username mm/dd - Set a date of birth for a user. Date format is customizable with an ENV variable.
+//   hubot remove birthday @username
 //   hubot list birthdays - List all known birthdays
+//   hubot check birthdays - Checks the birthdays of the day
 //
 // Notes:
 //   Birthday greeting messages based on Steffen Opel's
@@ -52,32 +54,34 @@ module.exports = function(robot) {
   });
 
   robot.respond(/check birthdays/i, function(msg) {
+    let text;
+    console.log("checking today's birthdays...");
     const birthdayUsers = findUsersBornOnDate(moment(), robot.brain.data.users);
 
     if (birthdayUsers.length === 1) {
       // send message for one users birthday
-      msg = `Today is <@${birthdayUsers[0].name}>'s birthday!`;
-      msg += `\n${quote()}`;
-      return robot.messageRoom(daily_post_room, msg);
+      text = `Today is <@${birthdayUsers[0].name}>'s birthday!`;
+      text += `\n${quote()}`;
+      return msg.send(text);
     } else if (birthdayUsers.length > 1) {
       // send message for multiple users birthdays
-      msg = "Today is ";
+      text = "Today is ";
       for (let idx = 0; idx < birthdayUsers.length; idx++) {
         var user = birthdayUsers[idx];
-        msg += `<@${user.name}>'s${idx !== (birthdayUsers.length - 1) ? " and " : ""}`;
+        text += `<@${user.name}>'s${idx !== (birthdayUsers.length - 1) ? " and " : ""}`;
       }
-      msg += " birthday!";
-      msg += `\n${quote()}`;
-      return robot.messageRoom(daily_post_room, msg);
+      text += " birthday!";
+      text += `\n${quote()}`;
+      return msg.send(text);
     } else {
-      msg = "Nobody has a birthday today";
-      return robot.messageRoom(daily_post_room, msg);
+      text = "Nobody has a birthday today";
+      return msg.send(text);
     }
   });
 
-  robot.hear(/(set birthday) (?:@?([\w .\-]+)\?*) (.*)/i, function(msg) {
-    const name = msg.match[2];
-    const date = msg.match[3];
+  robot.respond(/set birthday (?:@?([\w .\-]+)\?*) (.*)/i, function(msg) {
+    const name = msg.match[1];
+    const date = msg.match[2];
 
     const check_date = moment(date, date_format, true);
     if (!check_date.isValid()) {
@@ -99,8 +103,8 @@ module.exports = function(robot) {
     }
   });
 
-  robot.hear(/(remove birthday) (?:@?([\w .\-]+)\?*)\b/i, function(msg) {
-    const name = msg.match[2];
+  robot.respond(/remove birthday (?:@?([\w .\-]+)\?*)\b/i, function(msg) {
+    const name = msg.match[1];
 
     const users = robot.brain.usersForFuzzyName(name);
     if (users.length === 1) {
