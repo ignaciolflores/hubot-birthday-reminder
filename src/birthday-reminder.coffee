@@ -2,26 +2,31 @@
 #   Track birthdays for users
 #
 # Dependencies:
-#   "moment": "^2.10.6"
-#   "node-schedule": "^0.6.0"
+#   "moment": "^2.20.1"
+#   "node-schedule": "^1.3.0"
 #
 # Commands:
-#   set birthday @username dd/mm/ - Set a date of birth for a user
-#   hubot list birthdays - List all set date of births
+#   set birthday @username mm/dd - Set a date of birth for a user. Date format is customizable with an ENV variable.
+#   hubot list birthdays - List all known birthdays
 #
 # Notes:
 #   Birthday greeting messages based on Steffen Opel's
 #   https://github.com/github/hubot-scripts/blob/master/src/scripts/birthday.coffee
+#   Updated to allow any valid date format, according to the moment library
 #
 # Author:
 #   Phill Farrugia <me@phillfarrugia.com>
+#   MinnPost <tech@minnpost.com>
 
 schedule = require('node-schedule')
 moment = require('moment')
 
+date_format = process.env.BIRTHDAY_DATE_FORMAT || "MM/DD"
+daily_post_room = process.env.BIRTHDAY_DAILY_POST_ROOM || "#general"
+
 module.exports = (robot) ->
 
-  regex = /^(set birthday) (?:@?([\w .\-]+)\?*) ((0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[0-2]))\b/i
+  regex = /^(set birthday) (?:@?([\w .\-]+)\?*) (.*)/i
 
   # runs a cron job every day at 9:30 am
   dailyBirthdayCheck = schedule.scheduleJob process.env.BIRTHDAY_CRON_STRING, ->
@@ -30,27 +35,54 @@ module.exports = (robot) ->
 
     if birthdayUsers.length is 1
       # send message for one users birthday
-      msg = "<!channel> Today is <@#{birthdayUsers[0].name}>'s birthday!"
+      msg = "Today is <@#{birthdayUsers[0].name}>'s birthday!"
       msg += "\n#{quote()}"
-      robot.messageRoom "#general", msg
+      robot.messageRoom daily_post_room, msg
     else if birthdayUsers.length > 1
       # send message for multiple users birthdays
-      msg = "<!channel> Today is "
+      msg = "Today is "
       for user, idx in birthdayUsers
         msg += "<@#{user.name}>'s#{if idx != (birthdayUsers.length - 1) then " and " else ""}"
       msg += " birthday!"
       msg += "\n#{quote()}"
-      robot.messageRoom "#general", msg
+      robot.messageRoom daily_post_room, msg
+
+  robot.respond /check birthdays/i, (msg) ->
+    birthdayUsers = findUsersBornOnDate(moment(), robot.brain.data.users)
+
+    if birthdayUsers.length is 1
+      # send message for one users birthday
+      msg = "Today is <@#{birthdayUsers[0].name}>'s birthday!"
+      msg += "\n#{quote()}"
+      robot.messageRoom daily_post_room, msg
+    else if birthdayUsers.length > 1
+      # send message for multiple users birthdays
+      msg = "Today is "
+      for user, idx in birthdayUsers
+        msg += "<@#{user.name}>'s#{if idx != (birthdayUsers.length - 1) then " and " else ""}"
+      msg += " birthday!"
+      msg += "\n#{quote()}"
+      robot.messageRoom daily_post_room, msg
+    else
+      msg = "Nobody has a birthday today"
+      robot.messageRoom daily_post_room, msg
 
   robot.hear regex, (msg) ->
     name = msg.match[2]
     date = msg.match[3]
-    
+
+    check_date = moment(date, date_format, true)
+    unless check_date.isValid()
+      msg.send "This date doesn't appear to be a valid birthdate for #{name}. A valid date format is #{date_format}."
+      return
+      
     users = robot.brain.usersForFuzzyName(name)
     if users.length is 1
       user = users[0]
-      user.date_of_birth = date
-      msg.send "#{name} is now born on #{user.date_of_birth}"
+      date_formatted = moment(date, date_format);
+      date_unix = date_formatted.unix();
+      user.date_of_birth = date_unix
+      msg.send "#{name} is now born on #{moment.unix(user.date_of_birth).format(date_format)}"
     else if users.length > 1
       msg.send getAmbiguousUserText users
     else
@@ -65,7 +97,7 @@ module.exports = (robot) ->
       for k of (users or {})
         user = users[k]
         if isValidBirthdate user.date_of_birth
-          message += "#{user.name} was born on #{user.date_of_birth}\n"
+          message += "#{user.name} was born on #{moment.unix(user.date_of_birth).format(date_format)}\n"
       msg.send message
 
   getAmbiguousUserText = (users) ->
@@ -77,16 +109,15 @@ module.exports = (robot) ->
     for k of (users or {})
       user = users[k]
       if isValidBirthdate user.date_of_birth
-        if equalDates date, moment(user.date_of_birth, "DD/MM")
+        if equalDates date, moment.unix(user.date_of_birth)
           matches.push user
     return matches
 
   # returns `true` is date string is a valid date
   isValidBirthdate = (date) ->
     if date
-      if date.length > 0
-        if moment(date, "DD/MM").isValid
-          return true
+      if moment(date).isValid
+        return true
     return false
 
   # returns `true` if two dates have the same month and day of month
@@ -110,7 +141,7 @@ module.exports = (robot) ->
       "Birthdays are good for you. Statistics show that people who have the most live the longest!",
       "I'm so glad you were born, because you brighten my life and fill it with joy.",
       "Always remember: growing old is mandatory, growing up is optional.",
-      "Better to be over the hill than burried under it.",
+      "Better to be over the hill than buried under it.",
       "You always have such fun birthdays, you should have one every year.",
       "Happy birthday to you, a person who is smart, good looking, and funny and reminds me a lot of myself.",
       "We know we're getting old when the only thing we want for our birthday is not to be reminded of it.",
