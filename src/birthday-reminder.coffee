@@ -26,8 +26,6 @@ daily_post_room = process.env.BIRTHDAY_DAILY_POST_ROOM || "#general"
 
 module.exports = (robot) ->
 
-  regex = /^(set birthday) (?:@?([\w .\-]+)\?*) (.*)/i
-
   # runs a cron job every day at 9:30 am
   dailyBirthdayCheck = schedule.scheduleJob process.env.BIRTHDAY_CRON_STRING, ->
     console.log "checking today's birthdays..."
@@ -67,7 +65,7 @@ module.exports = (robot) ->
       msg = "Nobody has a birthday today"
       robot.messageRoom daily_post_room, msg
 
-  robot.hear regex, (msg) ->
+  robot.hear /(set birthday) (?:@?([\w .\-]+)\?*) (.*)/i, (msg) ->
     name = msg.match[2]
     date = msg.match[3]
 
@@ -83,6 +81,19 @@ module.exports = (robot) ->
       date_unix = date_formatted.unix();
       user.date_of_birth = date_unix
       msg.send "#{name} is now born on #{moment.unix(user.date_of_birth).format(date_format)}"
+    else if users.length > 1
+      msg.send getAmbiguousUserText users
+    else
+      msg.send "#{name}? Never heard of 'em"
+
+  robot.hear /(remove birthday) (?:@?([\w .\-]+)\?*)\b/i, (msg) ->
+    name = msg.match[2]
+
+    users = robot.brain.usersForFuzzyName(name)
+    if users.length is 1
+      user = users[0]
+      user.date_of_birth = null
+      msg.send "#{name} is now a forever alone outsider."
     else if users.length > 1
       msg.send getAmbiguousUserText users
     else
